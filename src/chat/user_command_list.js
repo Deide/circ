@@ -596,14 +596,13 @@ export default {
             var types,
                 context = this.win.getContext();
             if (this.types) {
-                types = this.types.split(" ");
-                types.forEach(type => this.chat.messageHandler.ignoreMessageType(context, type));
+                types = iter(this.types.split(" "))
+                    .tap(type => this.chat.messageHandler.ignoreMessageType(context, type));
                 return this.displayMessage("notice", `Messages of type ${getReadableList(types)} will no longer be displayed in this room.`);
             } else {
                 types = iter(this.chat.messageHandler.getIgnoredMessages()[context])
-                    .values()
-                    .toArray();
-                if (types && types.length > 0) {
+                    .values();
+                if (types.isEmpty()) {
                     return this.displayMessage("notice", `Messages of type ${getReadableList(types)} are being ignored in this room.`);
                 } else {
                     return this.displayMessage("notice", "There are no messages being ignored in this room.");
@@ -616,8 +615,8 @@ export default {
         "extends": "ignore",
         usage: "<message type 1> <message type 2> ...",
         run() {
-            var types = this.types.split(" ");
-            types.forEach(type => this.chat.messageHandler.stopIgnoringMessageType(this.win.getContext(), type));
+            var types = iter(this.types.split(" "))
+                .tap(type => this.chat.messageHandler.stopIgnoringMessageType(this.win.getContext(), type));
             return this.displayMessage("notice", `Messages of type ${getReadableList(types)} are no longer being ignored.`);
         }
     },

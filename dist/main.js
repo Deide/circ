@@ -8421,7 +8421,7 @@ var util = Object.freeze({
       return IRCMessageHandler;
   }(MessageHandler);
 
-  var version = "0.7.0";
+  var version = "0.7.1";
 
   var PROJECT_URL = "http://flackr.github.com/circ";
   var ISSUES_URL = "https://github.com/flackr/circ/issues";
@@ -10962,14 +10962,13 @@ var util = Object.freeze({
               var types,
                   context = this.win.getContext();
               if (this.types) {
-                  types = this.types.split(" ");
-                  types.forEach(function (type) {
+                  types = iter(this.types.split(" ")).tap(function (type) {
                       return _this5.chat.messageHandler.ignoreMessageType(context, type);
                   });
                   return this.displayMessage("notice", "Messages of type " + getReadableList(types) + " will no longer be displayed in this room.");
               } else {
-                  types = iter(this.chat.messageHandler.getIgnoredMessages()[context]).values().toArray();
-                  if (types && types.length > 0) {
+                  types = iter(this.chat.messageHandler.getIgnoredMessages()[context]).values();
+                  if (types.isEmpty()) {
                       return this.displayMessage("notice", "Messages of type " + getReadableList(types) + " are being ignored in this room.");
                   } else {
                       return this.displayMessage("notice", "There are no messages being ignored in this room.");
@@ -10984,8 +10983,7 @@ var util = Object.freeze({
           run: function run() {
               var _this6 = this;
 
-              var types = this.types.split(" ");
-              types.forEach(function (type) {
+              var types = iter(this.types.split(" ")).tap(function (type) {
                   return _this6.chat.messageHandler.stopIgnoringMessageType(_this6.win.getContext(), type);
               });
               return this.displayMessage("notice", "Messages of type " + getReadableList(types) + " are no longer being ignored.");
