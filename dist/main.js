@@ -8724,15 +8724,15 @@ var util = Object.freeze({
       PART: function PART(from, chan) {
           var c = this.irc.channels[chan.toLowerCase()];
           if (c) {
-              this.irc.emitMessage("part", chan, from.nick);
               if (this.irc.isOwnNick(from.nick)) {
                   delete this.irc.channels[chan.toLowerCase()];
                   return this.irc.emit("parted", chan);
               } else {
-                  return delete c.names[this.irc.util.normaliseNick(from.nick)];
+                  delete c.names[this.irc.util.normaliseNick(from.nick)];
+                  return this.irc.emitMessage("part", chan, from.nick);
               }
           } else {
-              return console.warn("Got TOPIC for a channel we're not in: " + chan);
+              return console.warn("Got PART for a channel we're not in: " + chan);
           }
       },
 
@@ -8749,17 +8749,15 @@ var util = Object.freeze({
               var _ref10 = babelHelpers.slicedToArray(_ref9, 2);
 
               var chan = _ref10[1];
-              return !(normNick in chan.names);
-          }).tap(function (_ref11) {
+              return normNick in chan.names;
+          }).each(function (_ref11) {
               var _ref12 = babelHelpers.slicedToArray(_ref11, 2);
 
+              var chanName = _ref12[0];
               var chan = _ref12[1];
-              return delete chan.names[normNick];
-          }).map(function (_ref13) {
-              var _ref14 = babelHelpers.slicedToArray(_ref13, 1);
 
-              var chanName = _ref14[0];
-              return _this4.irc.emitMessage("quit", chanName, from.nick, reason);
+              delete chan.names[normNick];
+              _this4.irc.emitMessage("quit", chanName, from.nick, reason);
           });
       },
 
@@ -8824,11 +8822,11 @@ var util = Object.freeze({
               return iter(modes.split("")).slice(1).map(function (mode) {
                   return modes[0] + mode;
               });
-          }).flatten().zip(toList).each(function (_ref15) {
-              var _ref16 = babelHelpers.slicedToArray(_ref15, 2);
+          }).flatten().zip(toList).each(function (_ref13) {
+              var _ref14 = babelHelpers.slicedToArray(_ref13, 2);
 
-              var mode = _ref16[0];
-              var argument = _ref16[1];
+              var mode = _ref14[0];
+              var argument = _ref14[1];
               return _this5.irc.emitMessage("mode", chan, from.nick, argument, mode);
           });
           return;
@@ -11176,7 +11174,7 @@ var util = Object.freeze({
                   var _babelHelpers$get;
 
                   // The command must be a developer command
-                  (_babelHelpers$get = babelHelpers.get(Object.getPrototypeOf(UserCommandHandler.prototype), "handle", this)).call.apply(_babelHelpers$get, [this].concat([type, context].concat(babelHelpers.toConsumableArray(rest))));
+                  (_babelHelpers$get = babelHelpers.get(Object.getPrototypeOf(UserCommandHandler.prototype), "handle", this)).call.apply(_babelHelpers$get, [this, type, context].concat(babelHelpers.toConsumableArray(rest)));
                   return;
               }
               command = this._handlers[type];
@@ -11240,13 +11238,18 @@ var util = Object.freeze({
           this._servers = [];
           this.length = 0;
       }
+      /**
+       * Get the correct window given the server and optionally the channel.
+       * @param  {string|number} serverName
+       * @param  {any} chan
+       * @return {Window|null} window
+       */
+
 
       babelHelpers.createClass(WindowList, [{
           key: "get",
           value: function get(serverName, chan) {
-              if (typeof arguments[0] === "number") {
-                  return this._getByNumber(arguments[0]);
-              }
+              if (typeof serverName === "number") return this._getByNumber(serverName);
 
               for (var i = 0, serLen = this._servers.length; i < serLen; i++) {
                   var server = this._servers[i];
@@ -11262,20 +11265,11 @@ var util = Object.freeze({
       }, {
           key: "_getByNumber",
           value: function _getByNumber(num) {
-              var server, _i, _len, _ref1;
-              _ref1 = this._servers;
-              for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-                  server = _ref1[_i];
-                  if (num === 0) {
-                      return server.serverWindow;
-                  } else {
-                      num -= 1;
-                  }
-                  if (num < server.windows.length) {
-                      return server.windows[num];
-                  } else {
-                      num -= server.windows.length;
-                  }
+              var servers = this._servers;
+              for (var i = 0, len = servers.length; i < len; i++) {
+                  var server = servers[i];
+                  if (num === 0) return server.serverWindow;else num -= 1;
+                  if (num < server.windows.length) return server.windows[num];else num -= server.windows.length;
               }
               return void 0;
           }
@@ -11286,10 +11280,9 @@ var util = Object.freeze({
       }, {
           key: "getChannelWindow",
           value: function getChannelWindow(index) {
-              var server, _i, _len, _ref1;
-              _ref1 = this._servers;
-              for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-                  server = _ref1[_i];
+              var servers = this._servers;
+              for (var i = 0, len = servers.length; i < len; i++) {
+                  var server = servers[i];
                   if (index < server.windows.length) {
                       return server.windows[index];
                   } else {
@@ -11305,8 +11298,8 @@ var util = Object.freeze({
       }, {
           key: "getServerWindow",
           value: function getServerWindow(index) {
-              var _ref1;
-              return (_ref1 = this._servers[index]) != null ? _ref1.serverWindow : void 0;
+              var serverWindow = this._servers[index];
+              return serverWindow != null ? serverWindow.serverWindow : void 0;
           }
       }, {
           key: "add",
@@ -11321,11 +11314,11 @@ var util = Object.freeze({
       }, {
           key: "_addChannelWindow",
           value: function _addChannelWindow(win) {
-              var server, _i, _len, _ref1, _ref2;
-              assert(((_ref1 = win.conn) != null ? _ref1.name : void 0) != null);
-              _ref2 = this._servers;
-              for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-                  server = _ref2[_i];
+              var conn = win.conn,
+                  servers = this._servers;
+              assert((conn != null ? conn.name : void 0) != null);
+              for (var i = 0, len = servers.length; i < len; i++) {
+                  var server = servers[i];
                   if (win.conn.name === server.name) {
                       this._addWindowToServer(server, win);
                       return;
@@ -11344,8 +11337,8 @@ var util = Object.freeze({
       }, {
           key: "_addServerWindow",
           value: function _addServerWindow(win) {
-              var _ref1;
-              assert(((_ref1 = win.conn) != null ? _ref1.name : void 0) != null);
+              var conn = win.conn;
+              assert((conn != null ? conn.name : void 0) != null);
               return this._servers.push({
                   name: win.conn.name,
                   serverWindow: win,
@@ -11676,6 +11669,9 @@ var util = Object.freeze({
           value: function remove(name) {
               var key = name.toLowerCase(),
                   node = this.nodes[key];
+
+              this._log("removing", node);
+
               if (node) {
                   node.html.remove();
                   delete this.nodes[key];
@@ -12617,18 +12613,15 @@ var util = Object.freeze({
       babelHelpers.createClass(Window, [{
           key: "getContext",
           value: function getContext() {
-              var _ref2;
-              if (this._context == null) {
-                  this._context = new Context((_ref2 = this.conn) != null ? _ref2.name : void 0, this.target);
-              }
+              if (this._context == null) this._context = new Context(this.conn != null ? this.conn.name : void 0, this.target);
+
               return this._context;
           }
       }, {
           key: "_onFocus",
           value: function _onFocus() {
-              if (!this._isVisible) {
-                  return;
-              }
+              if (!this._isVisible) return;
+
               this._isFocused = true;
               this.notifications.clear();
               return this.messageRenderer.onFocus();
@@ -12731,19 +12724,18 @@ var util = Object.freeze({
               this.$nicksContainer.append(this.$nicks);
               return this.$messagesContainer.restoreScrollPosition();
           }
+          /**
+           * @param  {any} from
+           * @param  {any} msg
+           * @param  {any} ...style
+           */
+
       }, {
           key: "message",
           value: function message() {
               var _messageRenderer;
 
-              for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-                  args[_key] = arguments[_key];
-              }
-
-              var from = args[0],
-                  msg = args[1],
-                  style = 3 <= args.length ? args.slice(2) : [];
-              return (_messageRenderer = this.messageRenderer).message.apply(_messageRenderer, [from, msg].concat(babelHelpers.toConsumableArray(style)));
+              return (_messageRenderer = this.messageRenderer).message.apply(_messageRenderer, arguments);
           }
 
           /**
@@ -12753,14 +12745,11 @@ var util = Object.freeze({
 
       }, {
           key: "rawMessage",
-          value: function rawMessage() {
-              for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                  args[_key2] = arguments[_key2];
+          value: function rawMessage(from, node) {
+              for (var _len = arguments.length, style = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+                  style[_key - 2] = arguments[_key];
               }
 
-              var from = args[0],
-                  node = args[1],
-                  style = 3 <= args.length ? args.slice(2) : [];
               return this.messageRenderer.rawMessage(from, node, style.join(" "));
           }
 
@@ -15568,9 +15557,7 @@ var util = Object.freeze({
               this.channelDisplay = new ChannelList();
               this.channelDisplay.on("clicked", function (server, chan) {
                   var win = _this2.winList.get(server, chan);
-                  if (win != null) {
-                      return _this2.switchToWindow(win);
-                  }
+                  if (win != null) return _this2.switchToWindow(win);
               });
               this.channelDisplay.on("midclicked", function (server, chan) {
                   _this2.disconnectAndRemoveRoom(server, chan);
@@ -16165,12 +16152,10 @@ var util = Object.freeze({
       }, {
           key: "switchToWindow",
           value: function switchToWindow(win) {
-              if (win == null) {
-                  throw new Error("switching to non-existant window");
-              }
-              if (this.currentWindow) {
-                  this.currentWindow.detach();
-              }
+              if (win == null) throw new Error("switching to non-existant window");
+
+              if (this.currentWindow) this.currentWindow.detach();
+
               this.currentWindow = win;
               win.attach();
               this._focusInput();
@@ -16181,11 +16166,9 @@ var util = Object.freeze({
           key: "_focusInput",
           value: function _focusInput() {
               var input = $("#input");
-              if (input) {
-                  setTimeout(function () {
-                      return input.focus();
-                  }, 0);
-              }
+              if (input) setTimeout(function () {
+                  return input.focus();
+              }, 0);
           }
       }, {
           key: "_selectWindowInChannelDisplay",
@@ -16523,11 +16506,7 @@ var util = Object.freeze({
       }, {
           key: "_getPossibleCompletions",
           value: function _getPossibleCompletions() {
-              var completions;
-              completions = [];
-              completions = completions.concat(this._getCommandCompletions());
-              completions = completions.concat(this._getNickCompletions());
-              return completions;
+              return this._getCommandCompletions().concat(this._getNickCompletions());
           }
 
           /**
@@ -16559,7 +16538,7 @@ var util = Object.freeze({
               if (nicks != null) {
                   return iter(nicks).values().map(function (nick) {
                       return new Completion(nick, Completion.NICK);
-                  }).toArray();
+                  });
               }
               return [];
           }

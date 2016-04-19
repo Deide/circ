@@ -114,15 +114,15 @@ export default {
     PART: function (from, chan) {
         var c = this.irc.channels[chan.toLowerCase()];
         if (c) {
-            this.irc.emitMessage("part", chan, from.nick);
             if (this.irc.isOwnNick(from.nick)) {
                 delete this.irc.channels[chan.toLowerCase()];
                 return this.irc.emit("parted", chan);
             } else {
-                return delete c.names[this.irc.util.normaliseNick(from.nick)];
+                delete c.names[this.irc.util.normaliseNick(from.nick)];
+                return this.irc.emitMessage("part", chan, from.nick);
             }
         } else {
-            return console.warn(`Got TOPIC for a channel we're not in: ${chan}`);
+            return console.warn(`Got PART for a channel we're not in: ${chan}`);
         }
     },
 
@@ -135,9 +135,11 @@ export default {
 
         return iter(this.irc.channels)
             .pairs()
-            .filter(([, chan]) => !(normNick in chan.names))
-            .tap(([, chan]) => delete chan.names[normNick])
-            .map(([chanName]) => this.irc.emitMessage("quit", chanName, from.nick, reason));
+            .filter(([, chan]) => normNick in chan.names)
+            .each(([chanName, chan]) => {
+                delete chan.names[normNick];
+                this.irc.emitMessage("quit", chanName, from.nick, reason);
+            });
     },
 
     PRIVMSG: function (from, target, msg) {

@@ -14,7 +14,7 @@ export default class MessageHandler {
     listenTo(emitter) {
         return iter(this._handlers)
             .values()
-            .each(type => emitter.on(type, (...args) => this.handle(...[type, ...args])));
+            .each(type => emitter.on(type, (...args) => this.handle(type, ...args)));
     }
 
     merge(handlerObject) {

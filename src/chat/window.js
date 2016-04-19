@@ -38,12 +38,12 @@ export default class Window extends EventEmitter {
                     left: main.offset().left - 4
                 }
             }).appendTo("body");
-            $(document).mousemove(function(e) {
+            $(document).mousemove(e => {
                 ghostbar.css("left", e.pageX);
             });
         });
 
-        $(document).mouseup(function(e) {
+        $(document).mouseup(e => {
             if (dragging) {
                 $("#rooms-and-nicks").css("width", e.pageX);
                 $("#ghostbar").remove();
@@ -54,17 +54,16 @@ export default class Window extends EventEmitter {
     }
 
     getContext() {
-        var _ref2;
-        if (this._context == null) {
-            this._context = new Context((_ref2 = this.conn) != null ? _ref2.name : void 0, this.target);
-        }
+        if (this._context == null)
+            this._context = new Context(this.conn != null ? this.conn.name : void 0, this.target);
+
         return this._context;
     }
 
     _onFocus() {
-        if (!this._isVisible) {
+        if (!this._isVisible)
             return;
-        }
+
         this._isFocused = true;
         this.notifications.clear();
         return this.messageRenderer.onFocus();
@@ -150,22 +149,20 @@ export default class Window extends EventEmitter {
         this.$nicksContainer.append(this.$nicks);
         return this.$messagesContainer.restoreScrollPosition();
     }
-
+    /**
+     * @param  {any} from
+     * @param  {any} msg
+     * @param  {any} ...style
+     */
     message(...args) {
-        var from = args[0],
-            msg = args[1],
-            style = 3 <= args.length ? args.slice(2) : [];
-        return this.messageRenderer.message(...[from, msg, ...style]);
+        return this.messageRenderer.message(...args);
     }
 
     /**
      * Display a raw html to the user.
      * This is useful for scripts to embed images or video.
      */
-    rawMessage(...args) {
-        var from = args[0],
-            node = args[1],
-            style = 3 <= args.length ? args.slice(2) : [];
+    rawMessage(from, node, ...style) {
         return this.messageRenderer.rawMessage(from, node, style.join(" "));
     }
 

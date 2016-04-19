@@ -68,11 +68,7 @@ export default class AutoComplete {
      * @return {Array.<Completion>}
      */
     _getPossibleCompletions() {
-        var completions;
-        completions = [];
-        completions = completions.concat(this._getCommandCompletions());
-        completions = completions.concat(this._getNickCompletions());
-        return completions;
+        return this._getCommandCompletions().concat(this._getNickCompletions());
     }
 
     /**
@@ -98,8 +94,7 @@ export default class AutoComplete {
         if (nicks != null) {
             return iter(nicks)
                 .values()
-                .map(nick => new Completion(nick, Completion.NICK))
-                .toArray();
+                .map(nick => new Completion(nick, Completion.NICK));
         }
         return [];
     }

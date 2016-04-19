@@ -9,10 +9,15 @@ export default class WindowList {
         this._servers = [];
         this.length = 0;
     }
+    /**
+     * Get the correct window given the server and optionally the channel.
+     * @param  {string|number} serverName
+     * @param  {any} chan
+     * @return {Window|null} window
+     */
     get(serverName, chan) {
-        if (typeof arguments[0] === "number") {
-            return this._getByNumber(arguments[0]);
-        }
+        if (typeof serverName === "number")
+            return this._getByNumber(serverName);
 
         for (let i = 0, serLen = this._servers.length; i < serLen; i++) {
             let server = this._servers[i];
@@ -27,20 +32,13 @@ export default class WindowList {
     }
 
     _getByNumber(num) {
-        var server, _i, _len, _ref1;
-        _ref1 = this._servers;
-        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-            server = _ref1[_i];
-            if (num === 0) {
-                return server.serverWindow;
-            } else {
-                num -= 1;
-            }
-            if (num < server.windows.length) {
-                return server.windows[num];
-            } else {
-                num -= server.windows.length;
-            }
+        var servers = this._servers;
+        for (let i = 0, len = servers.length; i < len; i++) {
+            let server = servers[i];
+            if (num === 0) return server.serverWindow;
+            else num -= 1;
+            if (num < server.windows.length) return server.windows[num];
+            else num -= server.windows.length;
         }
         return void 0;
     }
@@ -48,10 +46,9 @@ export default class WindowList {
      * The same as get(), but the index excludes server windows.
      */
     getChannelWindow(index) {
-        var server, _i, _len, _ref1;
-        _ref1 = this._servers;
-        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-            server = _ref1[_i];
+        var servers = this._servers;
+        for (let i = 0, len = servers.length; i < len; i++) {
+            let server = servers[i];
             if (index < server.windows.length) {
                 return server.windows[index];
             } else {
@@ -64,8 +61,8 @@ export default class WindowList {
      * The same as get(), but the index excludes channel windows.
      */
     getServerWindow(index) {
-        var _ref1;
-        return (_ref1 = this._servers[index]) != null ? _ref1.serverWindow : void 0;
+        var serverWindow = this._servers[index];
+        return serverWindow != null ? serverWindow.serverWindow : void 0;
     }
 
     add(win) {
@@ -78,11 +75,11 @@ export default class WindowList {
     }
 
     _addChannelWindow(win) {
-        var server, _i, _len, _ref1, _ref2;
-        assert(((_ref1 = win.conn) != null ? _ref1.name : void 0) != null);
-        _ref2 = this._servers;
-        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-            server = _ref2[_i];
+        var conn = win.conn,
+            servers = this._servers;
+        assert((conn != null ? conn.name : void 0) != null);
+        for (let i = 0, len = servers.length; i < len; i++) {
+            let server = servers[i];
             if (win.conn.name === server.name) {
                 this._addWindowToServer(server, win);
                 return;
@@ -97,8 +94,8 @@ export default class WindowList {
     }
 
     _addServerWindow(win) {
-        var _ref1;
-        assert(((_ref1 = win.conn) != null ? _ref1.name : void 0) != null);
+        var conn = win.conn;
+        assert((conn != null ? conn.name : void 0) != null);
         return this._servers.push({
             name: win.conn.name,
             serverWindow: win,

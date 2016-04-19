@@ -146,7 +146,7 @@ export default class RemoteConnection extends EventEmitter {
             isValid = this._onIRCState(device, rest);
             if (!isValid) return;
         }
-        return this.emit(...[type, ...args]);
+        return this.emit(type, ...args);
     }
 
     _onIRCState(device, args) {

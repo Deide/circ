@@ -92,9 +92,8 @@ export default class Chat extends EventEmitter {
         this.channelDisplay = new ChannelList();
         this.channelDisplay.on("clicked", (server, chan) => {
             let win = this.winList.get(server, chan);
-            if (win != null) {
+            if (win != null)
                 return this.switchToWindow(win);
-            }
         });
         this.channelDisplay.on("midclicked", (server, chan) => {
             this.disconnectAndRemoveRoom(server, chan);
@@ -313,9 +312,9 @@ export default class Chat extends EventEmitter {
         case "disconnect":
             return this.onDisconnected(conn);
         case "joined":
-            return this.onJoined.apply(this, [conn, e.context.channel, ...e.args]);
+            return this.onJoined(conn, e.context.channel, ...e.args);
         case "names":
-            return this.onNames.apply(this, [e, ...e.args]);
+            return this.onNames(e, ...e.args);
         case "parted":
             return this.onParted(e);
         case "nick":
@@ -328,7 +327,7 @@ export default class Chat extends EventEmitter {
         if (win === Chat.NO_WINDOW) return;
         this.messageHandler.setWindow(win);
         this.messageHandler.setCustomMessageStyle(e.style);
-        return this.messageHandler.handle(...[e.name, ...e.args]);
+        return this.messageHandler.handle(e.name, ...e.args);
     }
     /**
      * Determine the window for which the event belongs.
@@ -589,12 +588,12 @@ export default class Chat extends EventEmitter {
     }
 
     switchToWindow(win) {
-        if (win == null) {
+        if (win == null)
             throw new Error("switching to non-existant window");
-        }
-        if (this.currentWindow) {
+
+        if (this.currentWindow)
             this.currentWindow.detach();
-        }
+
         this.currentWindow = win;
         win.attach();
         this._focusInput();
@@ -604,9 +603,8 @@ export default class Chat extends EventEmitter {
 
     _focusInput() {
         var input = $("#input");
-        if (input) {
+        if (input)
             setTimeout(() => input.focus(), 0);
-        }
     }
 
     _selectWindowInChannelDisplay(win) {

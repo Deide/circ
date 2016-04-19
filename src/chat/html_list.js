@@ -72,6 +72,9 @@ export default class HTMLList extends EventEmitter {
     remove(name) {
         var key = name.toLowerCase(),
             node = this.nodes[key];
+
+        this._log("removing", node);
+
         if (node) {
             node.html.remove();
             delete this.nodes[key];

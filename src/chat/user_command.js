@@ -305,7 +305,7 @@ export default class UserCommand {
                 server: getFieldOrNull(this, ["conn", "name"]),
                 channel: this.chan
             };
-        return this.chat.displayMessage(...[type, context, ...rest]);
+        return this.chat.displayMessage(type, context, ...rest);
     }
 
     /**

@@ -27,7 +27,7 @@ export default class UserCommandHandler extends MessageHandler {
     listenTo(emitter) {
         return emitter.on("command", e => {
             if (this.canHandle(e.name)) {
-                return this.handle(...[e.name, e, ...e.args]);
+                return this.handle(e.name, e, ...e.args);
             }
         });
     }
@@ -39,11 +39,11 @@ export default class UserCommandHandler extends MessageHandler {
             rest = 3 <= arguments.length ? args.slice(2) : [];
         if (!this._isValidUserCommand(type)) {
             // The command must be a developer command
-            super.handle(...[type, context, ...rest]);
+            super.handle(type, context, ...rest);
             return;
         }
         command = this._handlers[type];
-        return command.tryToRun(...[context, ...rest]);
+        return command.tryToRun(context, ...rest);
     }
 
     _isValidUserCommand(type) {

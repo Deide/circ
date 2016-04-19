@@ -18,7 +18,7 @@ export default class DeveloperCommands extends MessageHandler {
 
     _handleCommand(command, text) {
         text = text || "";
-        return this._chat.userCommands(...[command, this.params[0], ...text.split(" ")]);
+        return this._chat.userCommands(command, this.params[0], ...text.split(" "));
     }
 }
 

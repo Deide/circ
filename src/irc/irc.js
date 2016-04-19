@@ -223,7 +223,7 @@ export default class IRC extends EventEmitter {
             cmd.command = parseInt(cmd.command, 10);
         }
         if (this.serverResponseHandler.canHandle(cmd.command)) {
-            return this.handle(...[cmd.command, this.util.parsePrefix(cmd.prefix), ...cmd.params]);
+            return this.handle(cmd.command, this.util.parsePrefix(cmd.prefix), ...cmd.params);
         } else {
             return this.emitMessage("other", Chat.SERVER_WINDOW, cmd);
         }

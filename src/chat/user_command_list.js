@@ -224,7 +224,7 @@ export default {
             return this["arguments"] = this["arguments"] ? this["arguments"].split(" ") : [];
         },
         run() {
-            var command = customCommandParser.parse(...[this.chan, this.command, ...this["arguments"]]);
+            var command = customCommandParser.parse(this.chan, this.command, ...this["arguments"]);
             return this.conn.irc.send(...command);
         }
     },
@@ -315,7 +315,7 @@ export default {
                 }
                 return this.conn.irc.doCommand("MODE", this.conn.irc.nick);
             } else {
-                return this.conn.irc.doCommand(...["MODE", this.target, this.mode, ...this.nicks]);
+                return this.conn.irc.doCommand("MODE", this.target, this.mode, ...this.nicks);
             }
         }
     },
