@@ -8174,11 +8174,10 @@ var util = Object.freeze({
       }, {
           key: "ignoreMessageType",
           value: function ignoreMessageType(context, type) {
-              var _base;
-              if ((_base = this._ignoredMessages)[context] == null) {
-                  _base[context] = {};
-              }
-              this._ignoredMessages[context][type.toLowerCase()] = true;
+              var ignored = this._ignoredMessages;
+              if (ignored[context] == null) ignored[context] = {};
+
+              ignored[context][type.toLowerCase()] = true;
               return this._chat.storage.ignoredMessagesChanged();
           }
 
@@ -8421,7 +8420,7 @@ var util = Object.freeze({
       return IRCMessageHandler;
   }(MessageHandler);
 
-  var version = "0.7.1";
+  var version = "0.7.2";
 
   var PROJECT_URL = "http://flackr.github.com/circ";
   var ISSUES_URL = "https://github.com/flackr/circ/issues";
@@ -10959,34 +10958,36 @@ var util = Object.freeze({
           run: function run() {
               var _this5 = this;
 
-              var types,
-                  context = this.win.getContext();
+              var types;
+              var context = this.win.getContext();
               if (this.types) {
-                  types = iter(this.types.split(" ")).tap(function (type) {
+                  types = iter(this.types.split(" "));
+                  types.each(function (type) {
                       return _this5.chat.messageHandler.ignoreMessageType(context, type);
                   });
                   return this.displayMessage("notice", "Messages of type " + getReadableList(types) + " will no longer be displayed in this room.");
               } else {
-                  types = iter(this.chat.messageHandler.getIgnoredMessages()[context]).values();
-                  if (types.isEmpty()) {
+                  types = iter(this.chat.messageHandler.getIgnoredMessages()[context]).keys();
+                  if (!types.isEmpty()) {
                       return this.displayMessage("notice", "Messages of type " + getReadableList(types) + " are being ignored in this room.");
-                  } else {
-                      return this.displayMessage("notice", "There are no messages being ignored in this room.");
-                  }
+                  } else return this.displayMessage("notice", "There are no messages being ignored in this room.");
               }
           }
       },
       "unignore": {
           description: "stop ignoring certain message(s)",
-          "extends": "ignore",
+          extends: "ignore",
           usage: "<message type 1> <message type 2> ...",
           run: function run() {
               var _this6 = this;
 
-              var types = iter(this.types.split(" ")).tap(function (type) {
-                  return _this6.chat.messageHandler.stopIgnoringMessageType(_this6.win.getContext(), type);
-              });
-              return this.displayMessage("notice", "Messages of type " + getReadableList(types) + " are no longer being ignored.");
+              if (this.types) {
+                  var types = iter(this.types.split(" "));
+                  types.each(function (type) {
+                      return _this6.chat.messageHandler.stopIgnoringMessageType(_this6.win.getContext(), type);
+                  });
+                  return this.displayMessage("notice", "Messages of type " + getReadableList(types) + " are no longer being ignored.");
+              } else return this.displayHelp();
           }
       },
       "theme": {
@@ -11157,26 +11158,21 @@ var util = Object.freeze({
           }
       }, {
           key: "handle",
-          value: function handle() {
-              var _command;
+          value: function handle(type, context) {
+              var _handlers$type;
 
-              for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-                  args[_key] = arguments[_key];
+              for (var _len = arguments.length, rest = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+                  rest[_key - 2] = arguments[_key];
               }
 
-              var command,
-                  type = args[0],
-                  context = args[1],
-                  rest = 3 <= arguments.length ? args.slice(2) : [];
               if (!this._isValidUserCommand(type)) {
                   var _babelHelpers$get;
 
                   // The command must be a developer command
-                  (_babelHelpers$get = babelHelpers.get(Object.getPrototypeOf(UserCommandHandler.prototype), "handle", this)).call.apply(_babelHelpers$get, [this, type, context].concat(babelHelpers.toConsumableArray(rest)));
+                  (_babelHelpers$get = babelHelpers.get(Object.getPrototypeOf(UserCommandHandler.prototype), "handle", this)).call.apply(_babelHelpers$get, [this, type, context].concat(rest));
                   return;
               }
-              command = this._handlers[type];
-              return (_command = command).tryToRun.apply(_command, [context].concat(babelHelpers.toConsumableArray(rest)));
+              return (_handlers$type = this._handlers[type]).tryToRun.apply(_handlers$type, [context].concat(rest));
           }
       }, {
           key: "_isValidUserCommand",

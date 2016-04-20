@@ -593,31 +593,34 @@ export default {
         requires: ["connection"],
         usage: "[<message type 1> <message type 2> ...]",
         run() {
-            var types,
-                context = this.win.getContext();
+            var types;
+            const context = this.win.getContext();
             if (this.types) {
-                types = iter(this.types.split(" "))
-                    .tap(type => this.chat.messageHandler.ignoreMessageType(context, type));
+                types = iter(this.types.split(" "));
+                types.each(type => this.chat.messageHandler.ignoreMessageType(context, type));
                 return this.displayMessage("notice", `Messages of type ${getReadableList(types)} will no longer be displayed in this room.`);
             } else {
-                types = iter(this.chat.messageHandler.getIgnoredMessages()[context])
-                    .values();
-                if (types.isEmpty()) {
+                types = iter(this.chat.messageHandler.getIgnoredMessages()[context]).keys();
+                if (!types.isEmpty()) {
                     return this.displayMessage("notice", `Messages of type ${getReadableList(types)} are being ignored in this room.`);
-                } else {
-                    return this.displayMessage("notice", "There are no messages being ignored in this room.");
                 }
+                else
+                    return this.displayMessage("notice", "There are no messages being ignored in this room.");
             }
         }
     },
     "unignore": {
         description: "stop ignoring certain message(s)",
-        "extends": "ignore",
+        extends: "ignore",
         usage: "<message type 1> <message type 2> ...",
         run() {
-            var types = iter(this.types.split(" "))
-                .tap(type => this.chat.messageHandler.stopIgnoringMessageType(this.win.getContext(), type));
-            return this.displayMessage("notice", `Messages of type ${getReadableList(types)} are no longer being ignored.`);
+            if (this.types) {
+                let types = iter(this.types.split(" "));
+                types.each(type => this.chat.messageHandler.stopIgnoringMessageType(this.win.getContext(), type));
+                return this.displayMessage("notice", `Messages of type ${getReadableList(types)} are no longer being ignored.`);
+            }
+            else
+                return this.displayHelp();
         }
     },
     "theme": {

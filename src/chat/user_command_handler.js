@@ -32,18 +32,13 @@ export default class UserCommandHandler extends MessageHandler {
         });
     }
 
-    handle(...args) {
-        var command,
-            type = args[0],
-            context = args[1],
-            rest = 3 <= arguments.length ? args.slice(2) : [];
+    handle(type, context, ...rest) {
         if (!this._isValidUserCommand(type)) {
             // The command must be a developer command
             super.handle(type, context, ...rest);
             return;
         }
-        command = this._handlers[type];
-        return command.tryToRun(context, ...rest);
+        return this._handlers[type].tryToRun(context, ...rest);
     }
 
     _isValidUserCommand(type) {

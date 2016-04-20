@@ -197,11 +197,11 @@ export default class IRCMessageHandler extends MessageHandler {
      * @param {string} type
      */
     ignoreMessageType(context, type) {
-        var _base;
-        if ((_base = this._ignoredMessages)[context] == null) {
-            _base[context] = {};
-        }
-        this._ignoredMessages[context][type.toLowerCase()] = true;
+        var ignored = this._ignoredMessages;
+        if (ignored[context] == null)
+            ignored[context] = {};
+
+        ignored[context][type.toLowerCase()] = true;
         return this._chat.storage.ignoredMessagesChanged();
     }
 
