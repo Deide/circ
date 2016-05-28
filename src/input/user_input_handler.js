@@ -113,7 +113,8 @@ export default class UserInputHander extends EventEmitter {
         if (e.which === keyCodes.toKeyCode("TAB")) {
             e.preventDefault();
             if (this.text) {
-                let textWithCompletion = this._autoComplete.getTextWithCompletion(this.text, this._getCursorPosition());
+                const textWithCompletion = this._autoComplete
+                    .getTextWithCompletion(this.text, this._getCursorPosition());
                 this.input.val(textWithCompletion);
                 return this._setCursorPosition(this._autoComplete.getUpdatedCursorPosition());
             }

@@ -85,7 +85,7 @@ export default class AutoComplete {
 
     /**
      * Returns a list of nicks in the current channel.
-     * @return {Array.<Completion>}
+     * @return {Array<Completion>}
      */
     _getNickCompletions() {
         var irc = this._context.currentWindow.conn.irc,
@@ -106,16 +106,16 @@ export default class AutoComplete {
      * @param {number} cursor The current position of the cursor.
      */
     getTextWithCompletion(text, cursor) {
-        var completion, textWithCompletion;
+        let completion, textWithCompletion;
         this._text = text;
         this._cursor = cursor;
-        if (this._previousText !== this._text) {
+        if (this._previousText !== this._text)
             this._completionFinder.reset();
-        }
+
         this._previousCursor = this._cursor;
-        if (!this._completionFinder.hasStarted) {
+        if (!this._completionFinder.hasStarted)
             this._extractStub();
-        }
+
         completion = this._getCompletion();
         textWithCompletion = this._preCompletion + completion + this._postCompletion;
         this._updatedCursorPosition = this._preCompletion.length + completion.length;
@@ -132,10 +132,10 @@ export default class AutoComplete {
      *  or space after.
      */
     _getCompletion() {
-        var completion = this._completionFinder.getCompletion(this._stub);
-        if (completion === CompletionFinder.NONE) {
+        const completion = this._completionFinder.getCompletion(this._stub);
+        if (completion === CompletionFinder.NONE)
             return this._stub;
-        }
+
         return completion.getText() + completion.getSuffix(this._preCompletion.length);
     }
 
@@ -144,11 +144,11 @@ export default class AutoComplete {
      *  and after the stub.
      */
     _extractStub() {
-        var preStubEnd, stubEnd;
-        stubEnd = this._findNearest(this._cursor - 1, /\S/);
-        if (stubEnd < 0) {
+        var preStubEnd,
+            stubEnd = this._findNearest(this._cursor - 1, /\S/);
+        if (stubEnd < 0)
             stubEnd = 0;
-        }
+
         preStubEnd = this._findNearest(stubEnd, /\s/);
         this._preCompletion = this._text.slice(0, preStubEnd + 1);
         this._stub = this._text.slice(preStubEnd + 1, +stubEnd + 1 || 9e9);

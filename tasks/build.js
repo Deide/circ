@@ -3,6 +3,7 @@ var json = require("rollup-plugin-json");
 var babel = require("rollup-plugin-babel");
 var nodeResolve = require("rollup-plugin-node-resolve");
 var commonJS = require("rollup-plugin-commonjs");
+var uglify = require("rollup-plugin-uglify");
 var fs = require("fs");
 
 var main, background, pluginenv;
@@ -21,16 +22,15 @@ main = rollup.rollup({
     entry: "src/main.js",
     //sourceMap: true,
     plugins: [
+        nodeResolve({browser: true}),
+        commonJS({
+            include: "node_modules/**"
+        }),
         json({exclude: "node_modules/**"}),
         babel({
-            exclude: "node_modules/**",
-            sourceMap: true
+            exclude: "node_modules/**"
         }),
-        nodeResolve({browser: true, sourceMap: true}),
-        commonJS({
-            include: "node_modules/**",
-            sourceMap: true
-        })
+        uglify()
     ]
 }).then(bundle => {
     bundle.write({

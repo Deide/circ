@@ -1,3 +1,4 @@
+import iter from "lazy.js";
 /**
  * Finds completions for a partial word.
  * Completion candidates can be set using setCompletions() or by specifying a
@@ -10,7 +11,8 @@ export default class CompletionFinder {
      * @param {function:string[]} opt_getCompletionsCallback
      */
     constructor(opt_getCompletionsCallback) {
-        this._completions = [];
+        this._emptyCompletions = () => iter([]);
+        this._completions = this._emptyCompletions();
         this._getCompletions = opt_getCompletionsCallback;
         this.reset();
     }
@@ -25,7 +27,7 @@ export default class CompletionFinder {
      * Clear stored completion candidates.
      */
     clearCompletions() {
-        return this._completions = [];
+        return this._completions = this._emptyCompletions();
     }
     /**
      * Add completion candidates.
@@ -70,7 +72,7 @@ export default class CompletionFinder {
 
         return this._currentCompletions = this._completions
             .filter(completion => {
-                let text = ignoreCase ? completion.toString().toLowerCase() : completion.toString();
+                const text = ignoreCase ? completion.toString().toLowerCase() : completion.toString();
                 return text.indexOf(this._currentStub) === 0;
             });
     }
@@ -81,15 +83,14 @@ export default class CompletionFinder {
      * @returns {string|NONE}
      */
     _getNextCompletion() {
-        var result;
-        if (this._currentCompletions.length === 0) {
+        if (this._currentCompletions.isEmpty())
             return CompletionFinder.NONE;
-        }
-        result = this._currentCompletions[this._completionIndex];
+
+        const result = this._currentCompletions.get(this._completionIndex);
         this._completionIndex++;
-        if (this._completionIndex >= this._currentCompletions.length) {
+        if (this._completionIndex >= this._currentCompletions.size())
             this._completionIndex = 0;
-        }
+
         return result;
     }
     /**
@@ -97,7 +98,7 @@ export default class CompletionFinder {
      * The current stub will be set again the next time getCompletion() is called.
      */
     reset() {
-        this._currentCompletions = [];
+        this._currentCompletions = null;
         this._completionIndex = 0;
         this.currentStub = "";
         return this.hasStarted = false;
