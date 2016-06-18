@@ -121,16 +121,15 @@ export default class IRC extends EventEmitter {
     }
 
     onTimeout() {
-        if (this.state === "connected" && this.exponentialBackoff > 0) {
+        if (this.state === "connected" && this.exponentialBackoff > 0)
             this.exponentialBackoff--;
-        }
+
         this.send("PING", +(new Date));
         return this.socket.setTimeout(60000, this.onTimeout);
     }
 
     onError(err) {
         this.emitMessage("socket_error", Chat.SERVER_WINDOW, err);
-        this.setReconnect();
         return this.socket.close();
     }
 
@@ -151,9 +150,8 @@ export default class IRC extends EventEmitter {
     }
 
     setReconnect() {
-        var backoff;
+        const backoff = 2000 * Math.pow(2, this.exponentialBackoff);
         this.state = "reconnecting";
-        backoff = 2000 * Math.pow(2, this.exponentialBackoff);
         this.reconnectTimeout = setTimeout(this.reconnect, backoff);
         if (!(this.exponentialBackoff > 4)) {
             return this.exponentialBackoff++;

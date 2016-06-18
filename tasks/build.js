@@ -20,7 +20,6 @@ function promisify(writeStream) {
 console.info("[Main] Building...");
 main = rollup.rollup({
     entry: "src/main.js",
-    //sourceMap: true,
     plugins: [
         nodeResolve({browser: true}),
         commonJS({

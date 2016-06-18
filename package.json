@@ -1,48 +1,48 @@
 {
-  "name": "circ",
-  "version": "0.7.3",
-  "description": "An IRC Chrome App",
-  "main": "dist/main.html",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "chrome test/test_runner.html",
-    "major": "node tasks/bump_version.js major && npm run build",
-    "minor": "node tasks/bump_version.js minor && npm run build",
-    "patch": "node tasks/bump_version.js patch && npm run build",
-    "build": "node tasks/build.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Deide/circ.git"
-  },
-  "keywords": [
-    "IRC",
-    "Chrome",
-    "CIRC"
-  ],
-  "author": "https://github.com/flackr/circ/graphs/contributors",
-  "license": "SEE LICENSE IN LICENSE",
-  "bugs": {
-    "url": "https://github.com/Deide/circ/issues"
-  },
-  "homepage": "https://github.com/Deide/circ#readme",
-  "devDependencies": {
-    "babel-plugin-transform-class-properties": "^6.6.0",
-    "babel-plugin-transform-function-bind": "^6.5.2",
-    "babel-preset-es2015-rollup": "^1.1.1",
-    "eslint": "^2.5.3",
-    "eslint-plugin-jasmine": "^1.7.0",
-    "rollup": "^0.26.3",
-    "rollup-plugin-babel": "^2.4.0",
-    "rollup-plugin-commonjs": "^2.2.1",
-    "rollup-plugin-json": "^2.0.0",
-    "rollup-plugin-node-resolve": "^1.5.0",
-    "rollup-plugin-uglify": "^0.3.1",
-    "semver": "^5.1.0"
-  },
-  "dependencies": {
-    "lazy.js": "github:deide/lazy.js"
-  }
+    "name": "circ",
+    "version": "0.7.4",
+    "description": "An IRC Chrome App",
+    "main": "dist/main.html",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "chrome test/test_runner.html",
+        "major": "node tasks/bump_version.js major && npm run build",
+        "minor": "node tasks/bump_version.js minor && npm run build",
+        "patch": "node tasks/bump_version.js patch && npm run build",
+        "build": "node tasks/build.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Deide/circ.git"
+    },
+    "keywords": [
+        "IRC",
+        "Chrome",
+        "CIRC"
+    ],
+    "author": "https://github.com/flackr/circ/graphs/contributors",
+    "license": "SEE LICENSE IN LICENSE",
+    "bugs": {
+        "url": "https://github.com/Deide/circ/issues"
+    },
+    "homepage": "https://github.com/Deide/circ#readme",
+    "devDependencies": {
+        "babel-plugin-transform-class-properties": "^6.10.2",
+        "babel-plugin-transform-function-bind": "^6.8.0",
+        "babel-preset-es2015-rollup": "^1.1.1",
+        "eslint": "^2.13.0",
+        "eslint-plugin-jasmine": "^1.8.1",
+        "rollup": "^0.31.2",
+        "rollup-plugin-babel": "~2.4.0",
+        "rollup-plugin-commonjs": "^3.0.0",
+        "rollup-plugin-json": "^2.0.0",
+        "rollup-plugin-node-resolve": "^1.7.0",
+        "rollup-plugin-uglify": "^1.0.0",
+        "semver": "^5.1.0"
+    },
+    "dependencies": {
+        "lazy.js": "github:deide/lazy.js"
+    }
 }

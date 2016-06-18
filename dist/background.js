@@ -111,6 +111,6 @@
                 }
             });
         }
-    }).call(this);
+    }).call(undefined);
 
 }());
