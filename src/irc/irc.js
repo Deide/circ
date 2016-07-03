@@ -133,27 +133,25 @@ export default class IRC extends EventEmitter {
         return this.socket.close();
     }
 
+    // Specifically called close - always done after an error (and "end")
     onClose() {
-        this.socket.setTimeout(0, this.onTimeout);
+        this.socket.clearTimeoutListener(this.onTimeout);
         if (this.state === "connected") {
             this.emit("disconnect");
             return this.setReconnect();
         }
     }
 
+    // Received error code -100
     onEnd() {
         console.error("remote peer closed connection");
-        if (this.state === "connecting" || this.state === "connected") {
-            this.emit("disconnect");
-            return this.setReconnect();
-        }
     }
 
     setReconnect() {
         const backoff = 2000 * Math.pow(2, this.exponentialBackoff);
         this.state = "reconnecting";
         this.reconnectTimeout = setTimeout(this.reconnect, backoff);
-        if (!(this.exponentialBackoff > 4)) {
+        if (this.exponentialBackoff < 4) {
             return this.exponentialBackoff++;
         }
     }

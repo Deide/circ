@@ -35,14 +35,15 @@ export default class AbstractTCPSocket extends EventEmitter {
             this.timeout_ms = ms;
             if (callback) return this.once("timeout", callback);
         }
-        else if (ms === 0) {
-            clearTimeout(this.timeout);
-            if (callback) {
-                this.removeListener("timeout", callback);
-            }
-            this.timeout = null;
-            return this.timeout_ms = 0;
+    }
+
+    clearTimeoutListener(callback) {
+        clearTimeout(this.timeout);
+        if (callback) {
+            this.removeListener("timeout", callback);
         }
+        this.timeout = null;
+        return this.timeout_ms = 0;
     }
 
     _active() {
